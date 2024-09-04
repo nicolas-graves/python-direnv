@@ -5,11 +5,6 @@ from IPython.terminal.embed import InteractiveShellEmbed
 
 
 @pytest.fixture
-def direnv_allow(monkeypatch):
-    monkeypatch.setattr("direnv.main.is_allowed", lambda _: True)
-
-
-@pytest.fixture
 def setup_env(tmp_path, monkeypatch):
     dotenv_file = tmp_path / ".envrc"
     dotenv_file.write_text("export a=b\n")

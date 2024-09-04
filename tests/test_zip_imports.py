@@ -8,11 +8,6 @@ from unittest import mock
 from zipfile import ZipFile
 
 
-@pytest.fixture
-def direnv_allow(monkeypatch):
-    monkeypatch.setattr("direnv.main.is_allowed", lambda _: True)
-
-
 def walk_to_root(path: str):
     last_dir = None
     current_dir = path

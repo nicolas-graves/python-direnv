@@ -64,7 +64,6 @@ def direnv_as_stream(path):
     )
     if result.returncode != 0:
         raise RuntimeError(f"Failed to source {path}: {result.stderr}")
-    sys.stdout.write(io.StringIO(result.stdout).getvalue())
     return io.StringIO(result.stdout)
 
 
@@ -115,25 +114,20 @@ def load_direnv(
     of `find_dotenv()`, you can explicitly call `find_dotenv()` and pass the result
     to this function as `dotenv_path`.
     """
-    if dotenv_path is None:
-        if stream is None:
-            dotenv_path = find_direnv()
-        else:
-            raise NotImplementedError(
-                "Executing unverified shell commands is not safe."
-            )
-    if not is_allowed(dotenv_path):
-        raise PermissionError(f"File {dotenv_path} is not allowed by direnv.")
-
-    direnv = DotEnv(
-        dotenv_path=None,
-        stream=direnv_as_stream(find_direnv(dotenv_path)),
+    env_dict = direnv_values(
+        dotenv_path=dotenv_path,
+        stream=stream,
         verbose=verbose,
         interpolate=interpolate,
-        override=override,
         encoding=encoding,
     )
-    return direnv.set_as_environment_variables()
+    for k, v in env_dict.items():
+        if k in os.environ and not override:
+            continue
+        if v is not None:
+            os.environ[k] = v
+
+    return True
 
 
 def direnv_values(
@@ -178,10 +172,8 @@ def direnv_values(
         encoding=encoding,
     ).dict()
 
-    filtered_env = {
+    return {
         key: value
         for key, value in env_dict.items()
-        if os.environ.get(key) not in [value, "PWD", "_"]
+        if key not in ["OLDPWD", "PWD", "SHLVL", "_"] and os.environ.get(key) != value
     }
-
-    return filtered_env

@@ -81,11 +81,9 @@ def find_direnv(
     result = dotenv.find_dotenv(filename, raise_error_if_not_found, usecwd)
     if result != "":
         return result
-    result = dotenv.find_dotenv(
+    return dotenv.find_dotenv(
         raise_error_if_not_found=raise_error_if_not_found, usecwd=usecwd
     )
-    if result != "":
-        return result
 
 
 def load_direnv(
@@ -160,7 +158,9 @@ def direnv_values(
             raise NotImplementedError(
                 "Executing shell commands from a stream is not safe."
             )
-    if not is_allowed(dotenv_path):
+    if dotenv_path == "":
+        return {}
+    elif not is_allowed(dotenv_path):
         raise PermissionError(f"File {dotenv_path} is not allowed by direnv.")
 
     env_dict = DotEnv(

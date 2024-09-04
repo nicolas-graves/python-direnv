@@ -4,7 +4,7 @@ from unittest import mock
 from IPython.terminal.embed import InteractiveShellEmbed
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def direnv_allow(monkeypatch):
     monkeypatch.setattr("direnv.main.is_allowed", lambda _: True)
 
@@ -20,20 +20,28 @@ def setup_env(tmp_path, monkeypatch):
 
 
 @mock.patch.dict(os.environ, {}, clear=True)
-def test_ipython_existing_variable_no_override(setup_env, monkeypatch):
+def test_ipython_existing_variable_no_override(setup_env, direnv_allow):
     os.environ["a"] = "c"
     setup_env.run_line_magic("direnv", "")
     assert os.environ == {"a": "c"}
 
 
 @mock.patch.dict(os.environ, {}, clear=True)
-def test_ipython_existing_variable_override(setup_env, monkeypatch):
+def test_ipython_existing_variable_override(setup_env, direnv_allow):
     os.environ["a"] = "c"
     setup_env.run_line_magic("direnv", "-o")
     assert os.environ == {"a": "b"}
 
 
 @mock.patch.dict(os.environ, {}, clear=True)
-def test_ipython_new_variable(setup_env, monkeypatch):
+def test_ipython_new_variable(setup_env, direnv_allow):
     setup_env.run_line_magic("direnv", "")
     assert os.environ == {"a": "b"}
+
+
+@mock.patch.dict(os.environ, {}, clear=True)
+def test_ipython_permission_error(setup_env):
+    with pytest.raises(PermissionError) as excinfo:
+        setup_env.run_line_magic("direnv", "")
+    assert "File" in str(excinfo.value)
+    assert ".envrc is not allowed by direnv." in str(excinfo.value)

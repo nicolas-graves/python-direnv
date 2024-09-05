@@ -57,7 +57,7 @@ def direnv_as_stream(path):
     file_path = os.path.abspath(path)
     wd = os.path.dirname(file_path)
     result = subprocess.run(
-        f"cd {wd} 2>&1 && source {file_path} 2>&1 && env",
+        f"cd {wd} 2>&1 && source {file_path} 2>&1 && declare -x",
         shell=True,
         capture_output=True,
         text=True,

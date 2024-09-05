@@ -30,7 +30,7 @@
     (build-system pyproject-build-system)
     (arguments '(#:tests? #f))
     (native-inputs (list python-hatchling))
-    (propagated-inputs (list python-dotenv python-ipython))
+    (propagated-inputs (list python-ipython))
     (home-page "")
     (synopsis "")
     (description "")

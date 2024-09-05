@@ -183,9 +183,7 @@ plan to apply them in another environment.
 
 This package is essentially implemented. I want to add proper parsing
 and use of the [direnv configuration
-file](https://direnv.net/man/direnv.toml.1.html). I only use one class
-and one function from the `python-dotenv` dependency so I might copy
-them instead of depend on them. PRs are welcome.
+file](https://direnv.net/man/direnv.toml.1.html).
 
 There are a [lot of options under
 bash](https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html)

@@ -7,7 +7,6 @@ import subprocess
 import sys
 from pathlib import Path
 from typing import IO, Dict, Iterable, Iterator, Mapping, Optional, Tuple, Union
-from dotenv.main import _walk_to_root
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +57,9 @@ def is_allowed(path):
 def parse_bash_env(
     stream: io.StringIO, encoding: Optional[str] = "utf-8"
 ) -> Iterator[Tuple[str, Optional[str]]]:
-    """Parses the stream and yields key-value pairs."""
+    """
+    Parses the stream and yields key-value pairs.
+    """
     for line_num, line in enumerate(stream, 1):
         line = line.strip()
         match = env_var_pattern.match(line)
@@ -85,6 +86,26 @@ def direnv_as_stream(path):
     if result.returncode != 0:
         raise RuntimeError(f"Failed to source {path}: {result.stderr}")
     return io.StringIO(result.stdout)
+
+
+# This function is copied from https://github.com/theskumar/python-dotenv
+# and is thus licensed under BSD-3.
+def _walk_to_root(path: str) -> Iterator[str]:
+    """
+    Yield directories starting from the given directory up to the root
+    """
+    if not os.path.exists(path):
+        raise IOError('Starting path not found')
+
+    if os.path.isfile(path):
+        path = os.path.dirname(path)
+
+    last_dir = None
+    current_dir = os.path.abspath(path)
+    while last_dir != current_dir:
+        yield current_dir
+        parent_dir = os.path.abspath(os.path.join(current_dir, os.path.pardir))
+        last_dir, current_dir = current_dir, parent_dir
 
 
 # This function is copied from https://github.com/theskumar/python-dotenv

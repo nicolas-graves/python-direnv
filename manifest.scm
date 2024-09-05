@@ -1,4 +1,5 @@
-(use-modules (guix packages)
+(use-modules (git)
+             (guix packages)
              (guix download)
              (guix git-download)
              ((guix licenses) #:prefix license:)
@@ -12,26 +13,21 @@
 (define %srcdir
   (dirname (current-filename)))
 
+(define %commit
+  (let ((repository (repository-open %srcdir)))
+    (oid->string (object-id (revparse-single repository "master")))))
+
 (packages->manifest
  (list
   python
-  python-dotenv
   python-ipython
-  python-pypa-build
   python-pytest
-  python-twine
-  (package
-   (name "python-direnv")
-   (version "0.0.0")
+  (package/inherit python-direnv
+   (version (git-version "0.2.1" "0" %commit))
     (source
      (local-file "." "python-direnv"
                  #:recursive? #t
                  #:select? (git-predicate %srcdir)))
     (build-system pyproject-build-system)
     (arguments '(#:tests? #f))
-    (native-inputs (list python-hatchling))
-    (propagated-inputs (list python-ipython))
-    (home-page "")
-    (synopsis "")
-    (description "")
-    (license license:bsd-3))))
+    (native-inputs (list python-hatchling)))))

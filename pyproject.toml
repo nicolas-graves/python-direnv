@@ -23,3 +23,9 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/direnv"]
+
+[tool.pycodestyle]
+max-line-length = 89
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

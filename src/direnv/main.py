@@ -1,18 +1,23 @@
-import os
-import dotenv
-from dotenv.main import DotEnv, _walk_to_root
-import subprocess
-from pathlib import Path
 import hashlib
 import io
+import logging
+import os
+import re
+import subprocess
 import sys
+from pathlib import Path
 from typing import IO, Dict, Iterable, Iterator, Mapping, Optional, Tuple, Union
+from dotenv.main import _walk_to_root
+
+logger = logging.getLogger(__name__)
 
 # A type alias for a string path to be used for the paths in this file.
 # These paths may flow to `open()` and `shutil.move()`; `shutil.move()`
 # only accepts string paths, not byte paths or file descriptors. See
 # https://github.com/python/typeshed/pull/6832.
 StrPath = Union[str, "os.PathLike[str]"]
+
+env_var_pattern = re.compile(r'declare -x (\w+)="(.*)"')
 
 
 def direnv_file_hash(path):
@@ -48,6 +53,21 @@ def is_allowed(path):
             real_path = f.read().strip()
             return os.path.realpath(path) == real_path
     return False
+
+
+def parse_bash_env(
+    stream: io.StringIO, encoding: Optional[str] = "utf-8"
+) -> Iterator[Tuple[str, Optional[str]]]:
+    """Parses the stream and yields key-value pairs."""
+    for line_num, line in enumerate(stream, 1):
+        line = line.strip()
+        match = env_var_pattern.match(line)
+        if match:
+            key = match.group(1)
+            value = match.group(2)
+            yield key, value
+        else:
+            logger.warning(f"Could not parse statement on line {line_num}: '{line}'")
 
 
 def direnv_as_stream(path):
@@ -192,17 +212,10 @@ def direnv_values(
     elif not is_allowed(dotenv_path):
         raise PermissionError(f"File {dotenv_path} is not allowed by direnv.")
 
-    env_dict = DotEnv(
-        dotenv_path=None,
-        stream=direnv_as_stream(find_direnv(dotenv_path)),
-        verbose=verbose,
-        interpolate=interpolate,
-        override=True,
-        encoding=encoding,
-    ).dict()
+    env_dict_items = parse_bash_env(direnv_as_stream(find_direnv(dotenv_path)))
 
     return {
         key: value
-        for key, value in env_dict.items()
+        for key, value in env_dict_items
         if key not in ["OLDPWD", "PWD", "SHLVL", "_"] and os.environ.get(key) != value
     }

@@ -10,4 +10,4 @@ def dotenv_path(tmp_path):
 
 @pytest.fixture
 def direnv_allow(monkeypatch):
-    monkeypatch.setattr("direnv.main.is_allowed", lambda _: True)
+    monkeypatch.setattr("direnv._is_allowed", lambda _: True)

@@ -136,7 +136,7 @@ def test_load_direnv_in_current_dir(tmp_path, direnv_allow):
             import direnv
             import os
             from unittest import mock
-            with mock.patch('direnv.main.is_allowed', lambda _: True):
+            with mock.patch('direnv._is_allowed', lambda _: True):
                 direnv.load_direnv(verbose=True)
                 print(os.environ['a'])
     """

@@ -9,7 +9,11 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import IO, Dict, Iterable, Iterator, Mapping, Optional, Tuple, Union
+from typing import Any, IO, Dict, Iterable, Iterator, Mapping, Optional, Tuple, Union
+from IPython.core.magic import Magics, line_magic, magics_class  # type: ignore
+from IPython.core.magic_arguments import (argument, magic_arguments,  # type: ignore
+                                          parse_argstring)  # type: ignore
+
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +26,7 @@ StrPath = Union[str, "os.PathLike[str]"]
 env_var_pattern = re.compile(r'declare -x (\w+)="(.*)"')
 
 
-def direnv_file_hash(path):
+def _direnv_file_hash(path):
     """
     Returns the direnv hash of a file.
     """
@@ -42,11 +46,11 @@ def _xdg_data_home():
         return str(Path.home() / ".local/share")
 
 
-def is_allowed(path):
+def _is_allowed(path):
     """
     Checks that direnv allows the execution of file.
     """
-    file_hash_value = direnv_file_hash(path)
+    file_hash_value = _direnv_file_hash(path)
     allowed_file_path = os.path.join(
         _xdg_data_home(), "direnv", "allow", file_hash_value
     )
@@ -57,7 +61,7 @@ def is_allowed(path):
     return False
 
 
-def parse_bash_env(
+def _parse_bash_env(
     stream: io.StringIO, encoding: Optional[str] = "utf-8"
 ) -> Iterator[Tuple[str, Optional[str]]]:
     """
@@ -74,7 +78,7 @@ def parse_bash_env(
             logger.warning(f"Could not parse statement on line {line_num}: '{line}'")
 
 
-def direnv_as_stream(path):
+def _direnv_as_stream(path):
     """
     Sources the .envrc file, output environment as a stream.
     """
@@ -251,13 +255,56 @@ def direnv_values(
         if verbose:
             logger.warning(".envrc file missing. Nothing will be loaded.")
         return {}
-    elif not is_allowed(dotenv_path):
+    elif not _is_allowed(dotenv_path):
         raise PermissionError(f"File {dotenv_path} is not allowed by direnv.")
 
-    env_dict_items = parse_bash_env(direnv_as_stream(find_direnv(dotenv_path)))
+    env_dict_items = _parse_bash_env(_direnv_as_stream(find_direnv(dotenv_path)))
 
     return {
         key: value
         for key, value in env_dict_items
         if key not in ["OLDPWD", "PWD", "SHLVL", "_"] and os.environ.get(key) != value
     }
+
+
+# This function is copied from https://github.com/theskumar/python-dotenv
+# SPDX-License-Identifier:  BSD-3-Clause
+# Copyright © 2014 Saurabh Kumar (python-dotenv)
+# Copyright © 2013, Ted Tieken (django-dotenv-rw),
+# Copyright © 2013, Jacob Kaplan-Moss (django-dotenv)
+@magics_class
+class IPythonDirEnv(Magics):
+
+    @magic_arguments()
+    @argument(
+        '-o', '--override', action='store_true',
+        help="Indicate to override existing variables"
+    )
+    @argument(
+        '-v', '--verbose', action='store_true',
+        help="Indicate function calls to be verbose"
+    )
+    @argument('dotenv_path', nargs='?', type=str, default='.envrc',
+              help='Search in increasingly higher folders for the `dotenv_path`')
+    @line_magic
+    def direnv(self, line):
+        args = parse_argstring(self.direnv, line)
+        # Locate the .envrc file
+        dotenv_path = args.dotenv_path
+        try:
+            dotenv_path = find_direnv(dotenv_path, True, True)
+        except IOError:
+            print("cannot find .envrc file")
+            return
+
+        # Load the .envrc file
+        load_direnv(dotenv_path, verbose=args.verbose, override=args.override)
+
+
+def _load_ipython_extension(ipython):
+    """Register the %direnv magic."""
+    ipython.register_magics(IPythonDirEnv)
+
+
+def load_ipython_extension(ipython: Any) -> None:
+    _load_ipython_extension(ipython)

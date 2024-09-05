@@ -71,7 +71,7 @@ def test_load_direnv_outside_zip_file_when_called_in_zipfile(tmp_path):
                     """
             import direnv
             from unittest import mock
-            with mock.patch('direnv.main.is_allowed', lambda _: True):
+            with mock.patch('direnv._is_allowed', lambda _: True):
                 direnv.load_direnv()
         """
                 ),

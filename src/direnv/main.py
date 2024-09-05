@@ -79,11 +79,11 @@ def direnv_as_stream(path):
     Sources the .envrc file, output environment as a stream.
     """
     file_path = os.path.abspath(path)
-    wd = os.path.dirname(file_path)
     result = subprocess.run(
-        f"cd {wd} 2>&1 && source {file_path} 2>&1 && declare -x",
-        shell=True,
+        f"source {file_path} 2>&1 && declare -x",
         capture_output=True,
+        cwd=os.path.dirname(file_path),
+        shell=True,
         text=True,
     )
     if result.returncode != 0:

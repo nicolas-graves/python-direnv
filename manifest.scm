@@ -30,4 +30,4 @@
                  #:select? (git-predicate %srcdir)))
     (build-system pyproject-build-system)
     (arguments '(#:tests? #f))
-    (native-inputs (list python-hatchling)))))
+    (native-inputs (list python-flit-core)))))

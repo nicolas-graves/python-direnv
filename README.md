@@ -137,7 +137,11 @@ return a `NotImplementedError`.
 
 No command-line interface is implemented.
 
-### Variable expansion
+### Arguments and variable expansion
+
+This package currently doesn't support neither `interpolate` nor
+`encoding` arguments, because the file is read with `source` and
+variables are expanded by default with `source`.
 
 Beware, variable expansion is not working in the same way as in
 python-dotenv, but as standard bash. This is mainly what you would
@@ -182,6 +186,11 @@ and use of the [direnv configuration
 file](https://direnv.net/man/direnv.toml.1.html). I only use one class
 and one function from the `python-dotenv` dependency so I might copy
 them instead of depend on them. PRs are welcome.
+
+There are a [lot of options under
+bash](https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html)
+that we could implement to add more options for parsing the file, that
+might be useful for some.
 
 This project is licensed under GPLv3 because it's easy for someone to
 create and share an unsafe version. To prevent that, I want to ensure

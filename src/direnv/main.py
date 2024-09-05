@@ -141,7 +141,7 @@ def load_direnv(
     verbose: bool = False,
     override: bool = False,
     interpolate: bool = True,
-    encoding: Optional[str] = "utf-8",
+    encoding: Optional[str] = None,
 ) -> bool:
     """Parse a .envrc file and then load all the variables found as environment variables.
 
@@ -152,15 +152,20 @@ def load_direnv(
         verbose: Whether to output a warning the .envrc file is missing.
         override: Whether to override the system environment variables with the variables
             from the `.envrc` file.
-        encoding: Encoding to be used to read the file.
+        encoding: Ignored.
+        interpolate: Ignored.
     Returns:
         Bool: True if at least one environment variable is set else False
 
-    If both `dotenv_path` and `stream` are `None`, `find_dotenv()` is used to find the
+    If both `dotenv_path` and `stream` are `None`, `find_direnv()` is used to find the
     .envrc file with it's default parameters. If you need to change the default parameters
-    of `find_dotenv()`, you can explicitly call `find_dotenv()` and pass the result
+    of `find_direnv()`, you can explicitly call `find_direnv()` and pass the result
     to this function as `dotenv_path`.
     """
+    if encoding is not None:
+        raise NotImplementedError("Use LC_ALL to change the encoding for now.")
+    if not interpolate:
+        raise NotImplementedError
     env_dict = direnv_values(
         dotenv_path=dotenv_path,
         stream=stream,
@@ -182,7 +187,7 @@ def direnv_values(
     stream: Optional[IO[str]] = None,
     verbose: bool = False,
     interpolate: bool = True,
-    encoding: Optional[str] = "utf-8",
+    encoding: Optional[str] = None,
 ) -> Dict[str, Optional[str]]:
     """
     Parse a .envrc file and return its content as a dict.
@@ -195,11 +200,16 @@ def direnv_values(
         dotenv_path: Absolute or relative path to the .envrc file.
         stream: `StringIO` object with .envrc content, used if `dotenv_path` is `None`.
         verbose: Whether to output a warning if the .envrc file is missing.
-        encoding: Encoding to be used to read the file.
+        interpolate: Ignored.
+        encoding: Ignored.
 
     If both `dotenv_path` and `stream` are `None`, `find_dotenv()` is used to find the
     .envrc file.
     """
+    if encoding is not None:
+        raise NotImplementedError("Use LC_ALL to change the encoding for now.")
+    if not interpolate:
+        raise NotImplementedError
     if dotenv_path is None:
         if stream is None:
             dotenv_path = find_direnv()

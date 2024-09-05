@@ -1,3 +1,8 @@
+# SPDX-License-Identifier:  BSD-3-Clause
+# Copyright © 2014 Saurabh Kumar (python-dotenv)
+# Copyright © 2013, Ted Tieken (django-dotenv-rw),
+# Copyright © 2013, Jacob Kaplan-Moss (django-dotenv)
+
 from IPython.core.magic import Magics, line_magic, magics_class  # type: ignore
 from IPython.core.magic_arguments import (argument, magic_arguments,  # type: ignore
                                           parse_argstring)  # type: ignore

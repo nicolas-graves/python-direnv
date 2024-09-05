@@ -1,5 +1,7 @@
-from typing import Any
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright © 2024 Nicolas Graves <ngraves@ngraves.fr>
 
+from typing import Any
 from .main import (direnv_values, find_direnv, is_allowed, load_direnv)
 
 

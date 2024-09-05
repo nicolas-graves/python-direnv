@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright © 2024 Nicolas Graves <ngraves@ngraves.fr>
+
 import hashlib
 import io
 import logging
@@ -89,7 +92,10 @@ def direnv_as_stream(path):
 
 
 # This function is copied from https://github.com/theskumar/python-dotenv
-# and is thus licensed under BSD-3.
+# SPDX-License-Identifier:  BSD-3-Clause
+# Copyright © 2014 Saurabh Kumar (python-dotenv)
+# Copyright © 2013, Ted Tieken (django-dotenv-rw),
+# Copyright © 2013, Jacob Kaplan-Moss (django-dotenv)
 def _walk_to_root(path: str) -> Iterator[str]:
     """
     Yield directories starting from the given directory up to the root
@@ -109,7 +115,10 @@ def _walk_to_root(path: str) -> Iterator[str]:
 
 
 # This function is copied from https://github.com/theskumar/python-dotenv
-# and is thus licensed under BSD-3.
+# SPDX-License-Identifier:  BSD-3-Clause
+# Copyright © 2014 Saurabh Kumar (python-dotenv)
+# Copyright © 2013, Ted Tieken (django-dotenv-rw),
+# Copyright © 2013, Jacob Kaplan-Moss (django-dotenv)
 def find_direnv(
     filename: str = ".envrc",
     raise_error_if_not_found: bool = False,

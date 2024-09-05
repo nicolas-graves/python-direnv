@@ -1,20 +1,25 @@
 # python-direnv
 
-Python-direnv executes a direnv `.envrc` file and sets its environment
-variables. It helps in the development of applications following the
-[12-factor](https://12factor.net/) principles. This package implements
-the same public API as python-dotenv.
+Python-direnv executes a [direnv](https://direnv.net) `.envrc` file
+and sets its environment variables. It helps in the development of
+applications following the [12-factor](https://12factor.net/)
+principles. This package implements the same public API as
+[python-dotenv](https://github.com/theskumar/python-dotenv).
 
-Contrary to most related projects, python-direnv will not read
-key-value pairs, but actually load them in a bash subshell, so you can
-use bash commands. This comes with a price (vulnerability to [shell
-injection](https://docs.python.org/3/library/subprocess.html#security-considerations)). In
-cases you can avoid that risk, it is recommended to use a safer
+Contrary to most [related python projects](#related-projects),
+python-direnv will not read key-value pairs, but actually load then
+extract them from a bash subshell.
+
+This unlocks the full functionality of bash, but comes with a price
+(vulnerability to [shell
+injection](https://docs.python.org/3/library/subprocess.html#security-considerations)). This
+risk is mitigated using `direnv`'s database : if a `.envrc` file has
+not been allowed to execute with `direnv allow`, the subshell will not
+be executed and will yield a `PermissionError`. You are responsible
+for what you execute.
+
+In cases you can avoid that risk, it is recommended to use a safer
 approach, see [related projects](#related-projects).
-
-That said, if a `.envrc` file has not been allowed to execute with
-`direnv allow`, the subshell will not be executed and will yield a
-`PermissionError`. You are responsible for what you execute.
 
 - [Getting Started](#getting-started)
 - [Other Use Cases](#other-use-cases)

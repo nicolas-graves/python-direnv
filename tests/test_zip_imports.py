@@ -62,7 +62,6 @@ def test_load_direnv_gracefully_handles_zip_imports_when_no_env_file(tmp_path):
     import child1.child2.test  # noqa
 
 
-@pytest.mark.skip(reason="Fails in python-dotenv too, and because of it")
 def test_load_direnv_outside_zip_file_when_called_in_zipfile(tmp_path):
     zip_file_path = setup_zipfile(
         tmp_path,
@@ -70,17 +69,18 @@ def test_load_direnv_outside_zip_file_when_called_in_zipfile(tmp_path):
             FileToAdd(
                 content=textwrap.dedent(
                     """
-            from direnv import load_direnv
-
-            load_direnv()
+            import direnv
+            from unittest import mock
+            with mock.patch('direnv.main.is_allowed', lambda _: True):
+                direnv.load_direnv()
         """
                 ),
                 path="child1/child2/test.py",
             ),
         ],
     )
-    dotenv_path = tmp_path / ".env"
-    dotenv_path.write_bytes(b"a=b")
+    dotenv_path = tmp_path / ".envrc"
+    dotenv_path.write_bytes(b"export a=b")
     code_path = tmp_path / "code.py"
     code_path.write_text(
         textwrap.dedent(
@@ -92,7 +92,7 @@ def test_load_direnv_outside_zip_file_when_called_in_zipfile(tmp_path):
 
         import child1.child2.test
 
-        print(os.environ['a'])
+        print(os.environ.get('a'))
     """
         )
     )
@@ -101,7 +101,6 @@ def test_load_direnv_outside_zip_file_when_called_in_zipfile(tmp_path):
         [sys.executable, str(code_path)],
         capture_output=True,
         cwd=str(tmp_path),
-        env={},
         text=True,
     )
     if result.returncode != 0:

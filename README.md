@@ -2,30 +2,30 @@
 
 Python-direnv executes a direnv `.envrc` file and sets its environment
 variables. It helps in the development of applications following the
-[12-factor](https://12factor.net/) principles.
+[12-factor](https://12factor.net/) principles. This package implements
+the same public API as python-dotenv.
 
 Contrary to most related projects, python-direnv will not read
 key-value pairs, but actually load them in a bash subshell, so you can
 use bash commands. This comes with a price (vulnerability to [shell
-injection](https://docs.python.org/3/library/subprocess.html#security-considerations))
-but not more than using `direnv` itself.
-
-In cases you can avoid that risk, it is recommended to use a safer
+injection](https://docs.python.org/3/library/subprocess.html#security-considerations)). In
+cases you can avoid that risk, it is recommended to use a safer
 approach, see [related projects](#related-projects).
 
-Additionally, this package implements the same public API as python-dotenv.
-
-If a `.envrc` file has not been allowed to execute with `direnv allow`, these functions will fail.
+That said, if a `.envrc` file has not been allowed to execute with
+`direnv allow`, the subshell will not be executed and will yield a
+`PermissionError`. You are responsible for what you execute.
 
 - [Getting Started](#getting-started)
 - [Other Use Cases](#other-use-cases)
   * [Load configuration without altering the environment](#load-configuration-without-altering-the-environment)
-  * [Load .env files in IPython](#load-env-files-in-ipython)
+  * [Load .envrc files in IPython](#load-envrc-files-in-ipython)
 - [Differences with python-dotenv](#differences-with-python-dotenv)
   * [Streams](#streams)
   * [Command-line interface](#command-line-interface)
   * [Variable expansion](#variable-expansion)
   * [direnv-values](#direnv-values)
+- [Development](#development)
 - [Related Projects](#related-projects)
 
 ## Getting Started
@@ -90,7 +90,7 @@ from direnv import direnv_values
 
 config = {
     **direnv_values(".env.shared"),  # load shared development variables
-    **direnvvalues(".env.secret"),  # load sensitive variables
+    **direnv_values(".env.secret"),  # load sensitive variables
     **os.environ,  # override loaded values with environment variables
 }
 ```
@@ -161,10 +161,21 @@ version makes more sense.
 
 ### direnv-values
 
-The function `direnv-values` doesn't environment variables if they are
-already set to the same return value in the current environment. This
-is because the dict is constructed from a diff between starting and
-finishing environment in the bash subshell.
+The function `direnv-values` doesn't record environment variables if
+they are set to the same return value than in the current
+environment. This is because the dict is constructed from a diff
+between starting and finishing environment in the bash subshell.
+
+This might matter if you extract some values with direnv-values, but
+plan to apply them in another environment.
+
+## Development
+
+This package is essentially implemented. I want to add proper parsing
+and use of the [direnv configuration
+file](https://direnv.net/man/direnv.toml.1.html). I only use one class
+and one function from the `python-dotenv` dependency so I might copy
+them instead of depend on them. PRs are welcome.
 
 ## Related Projects
 

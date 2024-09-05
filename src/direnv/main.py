@@ -218,6 +218,8 @@ def direnv_values(
                 "Executing shell commands from a stream is not safe."
             )
     if dotenv_path == "":
+        if verbose:
+            logger.warning(".envrc file missing. Nothing will be loaded.")
         return {}
     elif not is_allowed(dotenv_path):
         raise PermissionError(f"File {dotenv_path} is not allowed by direnv.")

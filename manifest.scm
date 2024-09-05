@@ -17,7 +17,9 @@
   python
   python-dotenv
   python-ipython
+  python-pypa-build
   python-pytest
+  python-twine
   (package
    (name "python-direnv")
    (version "0.0.0")

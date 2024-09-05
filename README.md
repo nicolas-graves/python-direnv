@@ -35,6 +35,7 @@ approach, see [related projects](#related-projects).
 
 ## Getting Started
 
+(This package is not yet uploaded to pypi.org, but you can install it from source).
 ```shell
 pip install python-direnv
 ```
@@ -44,7 +45,7 @@ application, launching it in development is not very practical because you have 
 those environment variables yourself.
 
 To help you with that, you can add Python-direnv to your application to make it load the
-configuration from a `.env` file when it is present (e.g. in development) while remaining
+configuration from a `.envrc` file when it is present (e.g. in development) while remaining
 configurable via the environment:
 
 ```python
@@ -181,6 +182,11 @@ and use of the [direnv configuration
 file](https://direnv.net/man/direnv.toml.1.html). I only use one class
 and one function from the `python-dotenv` dependency so I might copy
 them instead of depend on them. PRs are welcome.
+
+This project is licensed under GPLv3 because it's easy for someone to
+create and share an unsafe version. To prevent that, I want to ensure
+that anyone who modifies the project is required to be open about
+their changes and explain them clearly.
 
 ## Related Projects
 

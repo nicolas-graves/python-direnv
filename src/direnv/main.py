@@ -67,6 +67,8 @@ def direnv_as_stream(path):
     return io.StringIO(result.stdout)
 
 
+# This function is copied from https://github.com/theskumar/python-dotenv
+# and is thus licensed under BSD-3.
 def find_direnv(
     filename: str = ".envrc",
     raise_error_if_not_found: bool = False,

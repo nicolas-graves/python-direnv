@@ -23,7 +23,7 @@
   python-ipython
   python-pytest
   (package/inherit python-direnv
-   (version (git-version "0.2.1" "0" %commit))
+   (version (git-version "0.2.2" "0" %commit))
     (source
      (local-file "." "python-direnv"
                  #:recursive? #t

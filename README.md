@@ -190,6 +190,9 @@ bash](https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html)
 that we could implement to add more options for parsing the file, that
 might be useful for some.
 
+There is also a `direnv export SHELL` function that might be better
+than the current `source && declare -c` call it it's easy to parse.
+
 This project is licensed under GPLv3 because it's easy for someone to
 create and share an unsafe version. To prevent that, I want to ensure
 that anyone who modifies the project is required to be open about

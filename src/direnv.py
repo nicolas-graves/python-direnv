@@ -169,53 +169,6 @@ def find_direnv(
     return ''
 
 
-def load_direnv(
-    dotenv_path: Optional[StrPath] = None,
-    stream: Optional[IO[str]] = None,
-    verbose: bool = False,
-    override: bool = False,
-    interpolate: bool = True,
-    encoding: Optional[str] = None,
-) -> bool:
-    """Parse a .envrc file and then load all the variables found as environment variables.
-
-    Parameters:
-        dotenv_path: Absolute or relative path to .envrc file.
-        stream: Text stream (such as `io.StringIO`) with .envrc content, used if
-            `dotenv_path` is `None`.
-        verbose: Whether to output a warning the .envrc file is missing.
-        override: Whether to override the system environment variables with the variables
-            from the `.envrc` file.
-        encoding: Ignored.
-        interpolate: Ignored.
-    Returns:
-        Bool: True if at least one environment variable is set else False
-
-    If both `dotenv_path` and `stream` are `None`, `find_direnv()` is used to find the
-    .envrc file with it's default parameters. If you need to change the default parameters
-    of `find_direnv()`, you can explicitly call `find_direnv()` and pass the result
-    to this function as `dotenv_path`.
-    """
-    if encoding is not None:
-        raise NotImplementedError("Use LC_ALL to change the encoding for now.")
-    if not interpolate:
-        raise NotImplementedError
-    env_dict = direnv_values(
-        dotenv_path=dotenv_path,
-        stream=stream,
-        verbose=verbose,
-        interpolate=interpolate,
-        encoding=encoding,
-    )
-    for k, v in env_dict.items():
-        if k in os.environ and not override:
-            continue
-        if v is not None:
-            os.environ[k] = v
-
-    return True
-
-
 def direnv_values(
     dotenv_path: Optional[StrPath] = None,
     stream: Optional[IO[str]] = None,
@@ -265,6 +218,53 @@ def direnv_values(
         for key, value in env_dict_items
         if key not in ["OLDPWD", "PWD", "SHLVL", "_"] and os.environ.get(key) != value
     }
+
+
+def load_direnv(
+    dotenv_path: Optional[StrPath] = None,
+    stream: Optional[IO[str]] = None,
+    verbose: bool = False,
+    override: bool = False,
+    interpolate: bool = True,
+    encoding: Optional[str] = None,
+) -> bool:
+    """Parse a .envrc file and then load all the variables found as environment variables.
+
+    Parameters:
+        dotenv_path: Absolute or relative path to .envrc file.
+        stream: Text stream (such as `io.StringIO`) with .envrc content, used if
+            `dotenv_path` is `None`.
+        verbose: Whether to output a warning the .envrc file is missing.
+        override: Whether to override the system environment variables with the variables
+            from the `.envrc` file.
+        encoding: Ignored.
+        interpolate: Ignored.
+    Returns:
+        Bool: True if at least one environment variable is set else False
+
+    If both `dotenv_path` and `stream` are `None`, `find_direnv()` is used to find the
+    .envrc file with it's default parameters. If you need to change the default parameters
+    of `find_direnv()`, you can explicitly call `find_direnv()` and pass the result
+    to this function as `dotenv_path`.
+    """
+    if encoding is not None:
+        raise NotImplementedError("Use LC_ALL to change the encoding for now.")
+    if not interpolate:
+        raise NotImplementedError
+    env_dict = direnv_values(
+        dotenv_path=dotenv_path,
+        stream=stream,
+        verbose=verbose,
+        interpolate=interpolate,
+        encoding=encoding,
+    )
+    for k, v in env_dict.items():
+        if k in os.environ and not override:
+            continue
+        if v is not None:
+            os.environ[k] = v
+
+    return True
 
 
 # This function is copied from https://github.com/theskumar/python-dotenv

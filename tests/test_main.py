@@ -130,22 +130,26 @@ def test_load_direnv_in_current_dir(tmp_path, direnv_allow):
     dotenv_path = tmp_path / ".envrc"
     dotenv_path.write_bytes(b"export a=b")
     code_path = tmp_path / "code.py"
+    sys_path = ":".join(sys.path)
     code_path.write_text(
         textwrap.dedent(
-            """
+            f"""
+            import sys
+            sys.path = '{sys_path}'.split(':')
             import direnv
             import os
             from unittest import mock
             with mock.patch('direnv._is_allowed', lambda _: True):
                 direnv.load_direnv(verbose=True)
-                print(os.environ['a'])
+                print(os.environ.get('a'))
     """
         )
     )
     result = subprocess.run(
-        [sys.executable, str(code_path)],
+        [sys.executable, '-I', str(code_path)],
         capture_output=True,
         cwd=str(tmp_path),
+        env={},
         text=True,
     )
     if result.returncode != 0:

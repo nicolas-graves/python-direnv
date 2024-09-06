@@ -69,11 +69,11 @@ def test_load_direnv_outside_zip_file_when_called_in_zipfile(tmp_path):
             FileToAdd(
                 content=textwrap.dedent(
                     """
-            import direnv
-            from unittest import mock
-            with mock.patch('direnv._is_allowed', lambda _: True):
-                direnv.load_direnv()
-        """
+                    import direnv
+                    from unittest import mock
+                    with mock.patch('direnv._is_allowed', lambda _: True):
+                        direnv.load_direnv()
+                    """
                 ),
                 path="child1/child2/test.py",
             ),
@@ -82,12 +82,14 @@ def test_load_direnv_outside_zip_file_when_called_in_zipfile(tmp_path):
     dotenv_path = tmp_path / ".envrc"
     dotenv_path.write_bytes(b"export a=b")
     code_path = tmp_path / "code.py"
+    sys_path = ":".join(sys.path)
     code_path.write_text(
         textwrap.dedent(
             f"""
         import os
         import sys
 
+        sys.path = '{sys_path}'.split(':')
         sys.path.append("{zip_file_path}")
 
         import child1.child2.test
@@ -98,9 +100,10 @@ def test_load_direnv_outside_zip_file_when_called_in_zipfile(tmp_path):
     )
 
     result = subprocess.run(
-        [sys.executable, str(code_path)],
+        [sys.executable, '-I', str(code_path)],
         capture_output=True,
         cwd=str(tmp_path),
+        env={},
         text=True,
     )
     if result.returncode != 0:

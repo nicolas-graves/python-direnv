@@ -84,7 +84,7 @@ def _direnv_as_stream(path):
     """
     file_path = os.path.abspath(path)
     result = subprocess.run(
-        f"source {file_path} 2>&1 && declare -x",
+        f"source '{file_path}' 2>&1 && declare -x",
         capture_output=True,
         cwd=os.path.dirname(file_path),
         shell=True,
